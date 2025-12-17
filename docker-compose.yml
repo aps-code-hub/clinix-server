@@ -1,0 +1,76 @@
+version: '3.8'
+services:
+  # Relational Database (Auth, Appointments etc..)
+  postgres:
+    image: postgres:15-alpine
+    container_name: clinix_postgres
+    environment:
+      POSTGRES_USER: clinix_user
+      POSTGRES_PASSWORD: clinix_password
+      POSTGRES_DB: clinix_core
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - clinix_net
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U clinix_user -d clinix_core']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  # NoSQL Database (EMr / Medical Logs etc..)
+  mongodb:
+    image: mongo:6.0
+    container_name: clinix_mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - clinix_net
+  # Message Broker (Microservices Communication)
+  rabbitmq:
+    image: rabbitmq:3.12.0-management
+    container_name: clinix_rabbitmq
+    ports:
+      - '5672:5672' # (Microservices talk here)
+      - '15672:15672' # Management UI (You view this in browser)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - clinix_net
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  # Distributed Caching
+  redis:
+    image: redis:7-alpine
+    container_name: clinix_redis
+    ports:
+      - '6379:6379'
+    networks:
+      - clinix_net
+  # Observability (Tracing)
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: clinix_jaeger
+    ports:
+      - '16686:16686'
+      - '4317:4317'
+      - '4318:4318'
+    environment:
+      COLLECTOR_OTLP_ENABLED: 'true'
+    networks:
+      - clinix_net
+
+volumes:
+  postgres_data:
+  mongo_data:
+
+networks:
+  clinix_net:
+    driver: bridge
