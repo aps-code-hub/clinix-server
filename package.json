@@ -4,9 +4,28 @@
   "license": "MIT",
   "scripts": {},
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "@nestjs/common": "^11.1.9",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.1.9",
+    "@nestjs/cqrs": "^11.0.3",
+    "@nestjs/microservices": "^11.1.9",
+    "@nestjs/platform-fastify": "^11.1.9",
+    "amqp-connection-manager": "^5.0.0",
+    "amqplib": "^0.10.9",
+    "class-transformer": "^0.5.1",
+    "nestjs-pino": "^4.5.0",
+    "nestjs-zod": "^5.0.1",
+    "pino-http": "^11.0.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "uuid": "^13.0.0",
+    "zod": "^4.2.1"
+  },
   "devDependencies": {
     "@nx/js": "22.2.7",
+    "@nx/nest": "^22.2.7",
+    "@nx/node": "^22.2.7",
     "@nx/workspace": "22.2.7",
     "nx": "22.2.7"
   }
