@@ -1,4 +1,4 @@
-import { Module, RequestMethod } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { LoggerModule } from 'nestjs-pino/LoggerModule';
 
 import { AppController } from './app.controller';
@@ -19,7 +19,6 @@ import { AppService } from './app.service';
             : undefined,
         redact: { paths: ['req.headers.authorization', 'req.body.password'] },
       },
-      forRoutes: [{ path: '*path', method: RequestMethod.ALL }],
     }),
   ],
   controllers: [AppController],

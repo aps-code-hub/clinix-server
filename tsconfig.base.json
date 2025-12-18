@@ -15,8 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@clinix/shared": ["libs/shared/src/index.ts"],
-      "@clinix/infrastructure": ["libs/shared/infrastructure/src/index.ts"]
+      "@clinix/shared/infrastructure": [
+        "libs/shared/infrastructure/src/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]

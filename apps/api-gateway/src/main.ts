@@ -15,14 +15,13 @@ async function bootstrap() {
   );
 
   app.useLogger(app.get(Logger));
-  app.setGlobalPrefix('api/v1');
   app.enableCors();
 
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || 5000;
   await app.listen(port, '0.0.0.0');
 
   const logger = app.get(Logger);
-  logger.log(`🚀 API-Gateway is running on: http://localhost:${port}/api/v1`);
+  logger.log(`🚀 API-Gateway is running on: http://localhost:${port}`);
 }
 
 bootstrap();
