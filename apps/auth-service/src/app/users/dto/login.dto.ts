@@ -8,4 +8,8 @@ export class LoginDto {
   @IsString()
   @IsNotEmpty({ message: 'Password is required' })
   password: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Current Device Id is required' })
+  deviceId: string;
 }
