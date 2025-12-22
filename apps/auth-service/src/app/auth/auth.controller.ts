@@ -1,8 +1,19 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Post,
+  Body,
+  Request,
+  HttpCode,
+  UseGuards,
+  HttpStatus,
+  Controller,
+} from '@nestjs/common';
+
 import { AuthService } from './auth.service';
-import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from '../users/dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+
+import { JwtAuthGuard } from '@clinix/shared/auth';
 
 @Controller({
   path: 'auth',
@@ -29,11 +40,10 @@ export class AuthController {
   }
 
   @Post('logout')
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async logout(
-    @Body('deviceId') deviceId: string,
-    @Body('userId') userId: string
-  ) {
+  async logout(@Request() req: { userId: string; deviceId: string }) {
+    const { userId, deviceId } = req;
     return this.authService.logout(userId, deviceId);
   }
 }

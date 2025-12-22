@@ -7,9 +7,12 @@ import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
 import { HashingService } from './hashing/hashing.service';
 
+import { SharedAuthModule } from '@clinix/shared/auth';
+
 @Module({
   imports: [
     UsersModule,
+    SharedAuthModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
