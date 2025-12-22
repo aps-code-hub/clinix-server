@@ -44,7 +44,7 @@ async function bootstrap() {
   await app.listen(port, '0.0.0.0');
 
   const logger = app.get(Logger);
-  logger.log(`🚀 Application is running on: http://localhost:${port}/api`);
+  logger.log(`🚀 Auth service is running on: http://localhost:${port}/api`);
 }
 
 bootstrap();
