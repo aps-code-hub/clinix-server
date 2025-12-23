@@ -18,7 +18,8 @@
       "@clinix/shared/infrastructure": [
         "libs/shared/infrastructure/src/index.ts"
       ],
-      "@clinix/shared/auth": ["libs/shared/auth/src/index.ts"]
+      "@clinix/shared/auth": ["libs/shared/auth/src/index.ts"],
+      "@clinix/shared/rmq": ["libs/shared/rmq/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

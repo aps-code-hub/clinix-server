@@ -6,6 +6,7 @@ import {
   UseGuards,
   HttpStatus,
   Controller,
+  Get,
 } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
@@ -39,7 +40,7 @@ export class AuthController {
     return this.authService.refreshTokens(refreshTokenPayload);
   }
 
-  @Post('logout')
+  @Get('logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async logout(@Request() req: { userId: string; deviceId: string }) {
