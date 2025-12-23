@@ -34,17 +34,17 @@ enum BloodGroup {
 
 model Patient {
     id                 String      @id @default(uuid())
-    userId             String      @unique //Linked to auth service
+    userId             String      @unique
     firstName          String
     lastName           String
-    dateOfBirth        String
-    gender             String
+    dateOfBirth        DateTime
+    gender             Gender
     bloodGroup         BloodGroup? @default(UNKNOWN)
     status             Status      @default(ACTIVE)
     phone              String
     email              String
     address            Json?
-    emergencyContatcts Json?
+    emergencyContacts  Json?
     insurance          Insurance[]
     createdAt          DateTime    @default(now())
     updatedAt          DateTime    @updatedAt

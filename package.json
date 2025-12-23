@@ -4,12 +4,12 @@
   "license": "MIT",
   "scripts": {
     "start:gateway": "pnpm nx serve api-gateway --inspect --port=9230",
-    "start:auth": "npx prisma generate --schema apps/auth-service/prisma/schema.prisma && pnpm nx serve auth-service",
     "generate:auth:schema": "npx prisma generate --schema apps/auth-service/prisma/schema.prisma",
     "migrate:auth:db": "npx prisma migrate dev --name init_auth_schema --schema=apps/auth-service/prisma/schema.prisma",
-    "start:patient": "npx prisma generate --schema apps/patient-service/prisma/schema.prisma && pnpm nx serve patient-service --inspect --port=9230",
+    "start:auth": "pnpm run migrate:auth:db && pnpm run generate:auth:schema && pnpm nx serve auth-service",
     "generate:patient:schema": "npx prisma generate --schema apps/patient-service/prisma/schema.prisma",
-    "migrate:patient:db": "npx prisma migrate dev --name init_patient_schema --schema=apps/patient-service/prisma/schema.prisma"
+    "migrate:patient:db": "npx prisma migrate dev --name init_patient_schema --schema=apps/patient-service/prisma/schema.prisma",
+    "start:patient": "pnpm run migrate:patient:db && pnpm run generate:patient:schema && pnpm nx serve patient-service --inspect --port=9230"
   },
   "private": true,
   "dependencies": {

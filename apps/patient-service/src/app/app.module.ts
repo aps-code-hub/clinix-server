@@ -5,6 +5,7 @@ import { Module, RequestMethod } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { PrismaModule } from './prisma/prisma.module';
+import { SharedAuthModule } from '@clinix/shared/auth';
 
 @Module({
   imports: [
@@ -19,9 +20,10 @@ import { PrismaModule } from './prisma/prisma.module';
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['apps/patient-service/.env'],
+      envFilePath: 'apps/patient-service/.env',
     }),
     PrismaModule,
+    SharedAuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
