@@ -18,7 +18,7 @@ import { AppService } from './app.service';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: 'apps/api-gateway/.env',
     }),
     ThrottlerModule.forRoot([
       {
@@ -88,6 +88,16 @@ export class AppModule implements OnModuleInit {
         upstream: 'http://localhost:5001',
         prefix: '/auth',
         rewritePrefix: '/api/v1/auth',
+        http2: false,
+      });
+    });
+
+    await app.register(async (subApp) => {
+      subApp.removeContentTypeParser('application/json');
+      await subApp.register(proxy, {
+        upstream: 'http://localhost:5002',
+        prefix: '/patient',
+        rewritePrefix: '/api/v1/patient',
         http2: false,
       });
     });

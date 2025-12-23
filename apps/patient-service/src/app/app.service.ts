@@ -9,6 +9,27 @@ import { CreatePatientDto } from './dto/create-patient.dto';
 export class AppService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private readonly patientSelect = {
+    firstName: true,
+    lastName: true,
+    dateOfBirth: true,
+    gender: true,
+    bloodGroup: true,
+    phone: true,
+    email: true,
+    address: true,
+    emergencyContacts: true,
+    insurance: {
+      select: {
+        providerName: true,
+        policyNumber: true,
+        policyHolder: true,
+        groupNumber: true,
+        expirationDate: true,
+      },
+    },
+  } satisfies Prisma.PatientSelect;
+
   async createPatient(userId: string, payload: CreatePatientDto) {
     const existingPatient = await this.prisma.patient.findUnique({
       where: {
@@ -57,6 +78,7 @@ export class AppService {
               }
             : undefined,
       },
+      select: this.patientSelect,
     });
   }
 
@@ -65,9 +87,7 @@ export class AppService {
       where: {
         userId,
       },
-      include: {
-        insurance: true,
-      },
+      select: this.patientSelect,
     });
   }
 }

@@ -2,9 +2,7 @@ import { Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { LoggerModule } from 'nestjs-pino';
 
-import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { AppController } from './app.controller';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 
@@ -22,13 +20,13 @@ import { PrismaModule } from './prisma/prisma.module';
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['apps/auth-service/.env'],
+      envFilePath: 'apps/auth-service/.env',
     }),
     AuthModule,
     UsersModule,
     PrismaModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

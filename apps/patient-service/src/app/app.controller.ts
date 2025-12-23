@@ -22,19 +22,19 @@ export class AppController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.PATIENT)
   @Post()
-  async createProfile(
-    @Request() req: { user: { id: string } },
+  async createPatient(
+    @Request() req: { user: { userId: string } },
     @Body() payload: CreatePatientDto
   ) {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     return await this.appService.createPatient(userId, payload);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.PATIENT)
   @Get('me')
-  async getProfile(@Request() req: { user: { id: string } }) {
-    const userId = req.user.id;
+  async getProfile(@Request() req: { user: { userId: string } }) {
+    const userId = req.user.userId;
     return await this.appService.getProfile(userId);
   }
 }

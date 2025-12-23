@@ -37,9 +37,12 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    //3. return without password
-    const { password: _, ...result } = user;
-    return result;
+    return {
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      roles: user.roles,
+    };
   }
 
   async login(loginPayload: LoginDto) {
@@ -71,11 +74,9 @@ export class AuthService {
 
     await this.userService.updateLastLogin(user.id);
 
-    console.log('Checking Sessions', sessionInfo);
     return {
       ...tokens,
       user: {
-        id: user.id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
