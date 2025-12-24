@@ -3,8 +3,8 @@ import { LoggerModule } from 'nestjs-pino';
 import { ConfigModule } from '@nestjs/config';
 import { RequestMethod } from '@nestjs/common';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { PrismaModule } from './prisma/prisma.module';
+import { DoctorModule } from './doctor/doctor.module';
 
 @Module({
   imports: [
@@ -21,8 +21,10 @@ import { AppService } from './app.service';
       isGlobal: true,
       envFilePath: 'apps/doctor-service/.env',
     }),
+    PrismaModule,
+    DoctorModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
