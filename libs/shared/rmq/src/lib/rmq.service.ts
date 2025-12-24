@@ -47,7 +47,12 @@ export class RmqService {
         persistent: true, // Messages are saved to disk
         prefetchCount: 1, // Process one message at a time
         queueOptions: {
-          durable: true, // Queue survives broker restart
+          durable: true,
+        },
+        socketOptions: {
+          clientProperties: {
+            connection_name: queue,
+          },
         },
       },
     };

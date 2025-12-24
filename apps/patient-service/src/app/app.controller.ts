@@ -26,15 +26,18 @@ export class AppController {
     private readonly logger: Logger
   ) {}
 
-  @EventPattern('patient.created')
+  @EventPattern('user.created.patient')
   async handlePatientCreated(
-    @Payload() data: CreatePatientDto & { userId: string },
+    @Payload() createPatientDto: CreatePatientDto & { userId: string },
     @Ctx() context: RmqContext
   ) {
-    this.logger.log(`Received event: patient.created for ${data.email}`);
-
-    await this.appService.createPatientFromEvent(data.userId, data);
-
+    this.logger.log(
+      `Received event: user.created.patient for ${createPatientDto.email}`
+    );
+    await this.appService.createPatientFromEvent(
+      createPatientDto.userId,
+      createPatientDto
+    );
     this.rmqService.ack(context);
   }
 

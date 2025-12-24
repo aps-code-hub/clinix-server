@@ -19,7 +19,7 @@ import { DoctorModule } from './doctor/doctor.module';
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: 'apps/doctor-service/.env',
+      envFilePath: '.env',
     }),
     PrismaModule,
     DoctorModule,

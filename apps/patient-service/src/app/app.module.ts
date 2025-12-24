@@ -22,7 +22,7 @@ import { PrismaModule } from './prisma/prisma.module';
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: 'apps/patient-service/.env',
+      envFilePath: '.env',
     }),
     PrismaModule,
     SharedAuthModule,

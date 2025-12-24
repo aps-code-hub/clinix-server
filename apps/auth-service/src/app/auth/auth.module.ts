@@ -25,7 +25,7 @@ import { SharedAuthModule } from '@clinix/shared/auth';
       }),
     }),
     RmqModule.register({
-      name: 'PATIENT_SERVICE',
+      name: 'RMQ_SERVICE',
     }),
   ],
   controllers: [AuthController],

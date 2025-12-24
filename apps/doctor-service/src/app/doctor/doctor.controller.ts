@@ -1,3 +1,4 @@
+import { Logger } from 'nestjs-pino';
 import { Controller } from '@nestjs/common';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 
@@ -14,15 +15,23 @@ import { CreateDoctorDto } from './dto/create-doctor.dto';
 export class DoctorController {
   constructor(
     private readonly doctorService: DoctorService,
-    private readonly rmqService: RmqService
+    private readonly rmqService: RmqService,
+    private readonly logger: Logger
   ) {}
 
-  @EventPattern('doctor.created')
+  @EventPattern('user.created.doctor')
   async handleDoctorCreated(
-    @Payload() doctorPayload: CreateDoctorDto & { userId: string },
+    @Payload()
+    createDoctorDto: CreateDoctorDto & { userId: string },
     @Ctx() context: RmqContext
   ) {
-    await this.doctorService.createDoctor(doctorPayload.userId, doctorPayload);
+    this.logger.log(
+      `Received event: user.created.doctor for ${createDoctorDto.email}`
+    );
+    await this.doctorService.createDoctor(
+      createDoctorDto.userId,
+      createDoctorDto
+    );
     this.rmqService.ack(context);
   }
 

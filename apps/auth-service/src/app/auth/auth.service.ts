@@ -8,14 +8,13 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
 
-import { Role } from '@clinix/shared/auth';
-
 import { LoginDto } from '../users/dto/login.dto';
 import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { HashingService } from './hashing/hashing.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class AuthService {
@@ -27,8 +26,9 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly prisma: PrismaService,
+    private readonly logger: Logger,
 
-    @Inject('PATIENT_SERVICE') private readonly patientClient: ClientProxy
+    @Inject('RMQ_SERVICE') private readonly rmqClient: ClientProxy
   ) {}
 
   async registerUser(createUserPayload: CreateUserDto) {
@@ -43,15 +43,17 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    const isPateint = newUser.roles.includes(Role.PATIENT);
-
-    if (isPateint) {
-      this.patientClient.emit('patient.created', {
-        userId: newUser.id,
-        email: newUser.email,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-      });
+    if (newUser.roles && newUser.roles.length > 0) {
+      for (const role of newUser.roles) {
+        const routingKey = `user.created.${role.toLowerCase()}`;
+        this.logger.log(`Emitting event: ${routingKey} for ${newUser.email}`);
+        this.rmqClient.emit(routingKey, {
+          userId: newUser.id,
+          email: newUser.email,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+        });
+      }
     }
 
     return {
