@@ -1,0 +1,41 @@
+generator client {
+    provider = "prisma-client-js"
+    output   = "../../../node_modules/@generated/doctor-client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum DoctorStatus {
+    PENDING
+    IN_REVIEW
+    VERIFIED
+    REJECTED
+    SUSPENDED
+}
+
+model Doctor {
+    id              String       @id @default(uuid())
+    userId          String       @unique
+    email           String       @unique
+    firstName       String
+    lastName        String
+    phone           String?
+    specialization  String?
+    licenseNumber   String?      @unique
+    bio             String?
+    consultationFee Decimal?
+    experienceYears Int?
+    status          DoctorStatus @default(PENDING)
+    isAvailable     Boolean      @default(false)
+    createdAt       DateTime     @default(now())
+    updatedAt       DateTime     @updatedAt
+
+    @@index(userId)
+    @@index(email)
+    @@index(specialization)
+    @@index(licenseNumber)
+    @@map("doctors")
+}
