@@ -13,12 +13,12 @@ CREATE TABLE "patients" (
     "userId" TEXT NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
-    "dateOfBirth" TIMESTAMP(3) NOT NULL,
-    "gender" "Gender" NOT NULL,
+    "email" TEXT NOT NULL,
+    "dateOfBirth" TIMESTAMP(3),
+    "gender" "Gender",
     "bloodGroup" "BloodGroup" DEFAULT 'UNKNOWN',
     "status" "Status" NOT NULL DEFAULT 'ACTIVE',
-    "phone" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
+    "phone" TEXT,
     "address" JSONB,
     "emergencyContacts" JSONB,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -28,20 +28,23 @@ CREATE TABLE "patients" (
 );
 
 -- CreateTable
-CREATE TABLE "insurances" (
+CREATE TABLE "patient_insurances" (
     "id" TEXT NOT NULL,
     "patientId" TEXT NOT NULL,
-    "providerName" TEXT NOT NULL,
-    "policyNumber" TEXT NOT NULL,
-    "policyHolder" TEXT NOT NULL,
+    "policyNumber" TEXT,
+    "providerName" TEXT,
+    "policyHolder" TEXT,
     "groupNumber" TEXT,
-    "expirationDate" TIMESTAMP(3) NOT NULL,
+    "expirationDate" TIMESTAMP(3),
 
-    CONSTRAINT "insurances_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "patient_insurances_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
 CREATE UNIQUE INDEX "patients_userId_key" ON "patients"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "patients_email_key" ON "patients"("email");
 
 -- CreateIndex
 CREATE INDEX "patients_userId_idx" ON "patients"("userId");
@@ -56,10 +59,16 @@ CREATE INDEX "patients_firstName_lastName_idx" ON "patients"("firstName", "lastN
 CREATE INDEX "patients_dateOfBirth_idx" ON "patients"("dateOfBirth");
 
 -- CreateIndex
-CREATE INDEX "insurances_patientId_idx" ON "insurances"("patientId");
+CREATE UNIQUE INDEX "patient_insurances_patientId_key" ON "patient_insurances"("patientId");
 
 -- CreateIndex
-CREATE INDEX "insurances_providerName_policyNumber_idx" ON "insurances"("providerName", "policyNumber");
+CREATE UNIQUE INDEX "patient_insurances_policyNumber_key" ON "patient_insurances"("policyNumber");
+
+-- CreateIndex
+CREATE INDEX "patient_insurances_patientId_idx" ON "patient_insurances"("patientId");
+
+-- CreateIndex
+CREATE INDEX "patient_insurances_providerName_policyNumber_idx" ON "patient_insurances"("providerName", "policyNumber");
 
 -- AddForeignKey
-ALTER TABLE "insurances" ADD CONSTRAINT "insurances_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "patients"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "patient_insurances" ADD CONSTRAINT "patient_insurances_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "patients"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

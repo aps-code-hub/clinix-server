@@ -1,17 +1,21 @@
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 import {
-  ForbiddenException,
+  Inject,
   Injectable,
+  ForbiddenException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { ClientProxy } from '@nestjs/microservices';
+
+import { Role } from '@clinix/shared/auth';
 
 import { LoginDto } from '../users/dto/login.dto';
 import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { HashingService } from './hashing/hashing.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +26,9 @@ export class AuthService {
     private readonly hashingService: HashingService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
+
+    @Inject('PATIENT_SERVICE') private readonly patientClient: ClientProxy
   ) {}
 
   async registerUser(createUserPayload: CreateUserDto) {
@@ -32,16 +38,27 @@ export class AuthService {
     );
 
     // 2. Create user with the hased password
-    const user = await this.userService.create({
+    const newUser = await this.userService.create({
       ...createUserPayload,
       password: hashedPassword,
     });
 
+    const isPateint = newUser.roles.includes(Role.PATIENT);
+
+    if (isPateint) {
+      this.patientClient.emit('patient.created', {
+        userId: newUser.id,
+        email: newUser.email,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+      });
+    }
+
     return {
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      roles: user.roles,
+      email: newUser.email,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      roles: newUser.roles,
     };
   }
 

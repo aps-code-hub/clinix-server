@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
 import { HashingService } from './hashing/hashing.service';
 
+import { RmqModule } from '@clinix/shared/rmq';
 import { SharedAuthModule } from '@clinix/shared/auth';
 
 @Module({
@@ -22,6 +23,9 @@ import { SharedAuthModule } from '@clinix/shared/auth';
           expiresIn: configService.get('JWT_EXPIRES_IN') || '1d',
         },
       }),
+    }),
+    RmqModule.register({
+      name: 'PATIENT_SERVICE',
     }),
   ],
   controllers: [AuthController],

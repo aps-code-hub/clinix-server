@@ -2,10 +2,12 @@ import { LoggerModule } from 'nestjs-pino';
 import { ConfigModule } from '@nestjs/config';
 import { Module, RequestMethod } from '@nestjs/common';
 
+import { SharedAuthModule } from '@clinix/shared/auth';
+import { RmqModule } from '@clinix/shared/rmq';
+
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { PrismaModule } from './prisma/prisma.module';
-import { SharedAuthModule } from '@clinix/shared/auth';
 
 @Module({
   imports: [
@@ -24,6 +26,7 @@ import { SharedAuthModule } from '@clinix/shared/auth';
     }),
     PrismaModule,
     SharedAuthModule,
+    RmqModule,
   ],
   controllers: [AppController],
   providers: [AppService],

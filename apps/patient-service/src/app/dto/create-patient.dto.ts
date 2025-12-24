@@ -83,23 +83,25 @@ export class CreatePatientDto {
   @IsNotEmpty()
   lastName: string;
 
-  @IsDateString()
-  dateOfBirth: string;
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
 
+  @IsOptional()
+  @IsDateString()
+  dateOfBirth?: string;
+
+  @IsOptional()
   @IsEnum(Gender)
-  gender: Gender;
+  gender?: Gender;
 
   @IsOptional()
   @IsEnum(BloodGroup)
   bloodGroup?: BloodGroup;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  phone: string;
-
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
+  phone?: string;
 
   @IsOptional()
   @ValidateNested()

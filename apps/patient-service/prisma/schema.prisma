@@ -33,21 +33,21 @@ enum BloodGroup {
 }
 
 model Patient {
-    id                 String      @id @default(uuid())
-    userId             String      @unique
-    firstName          String
-    lastName           String
-    dateOfBirth        DateTime
-    gender             Gender
-    bloodGroup         BloodGroup? @default(UNKNOWN)
-    status             Status      @default(ACTIVE)
-    phone              String
-    email              String
-    address            Json?
-    emergencyContacts  Json?
-    insurance          Insurance[]
-    createdAt          DateTime    @default(now())
-    updatedAt          DateTime    @updatedAt
+    id                String      @id @default(uuid())
+    userId            String      @unique
+    firstName         String
+    lastName          String
+    email             String      @unique
+    dateOfBirth       DateTime?
+    gender            Gender?
+    bloodGroup        BloodGroup? @default(UNKNOWN)
+    status            Status      @default(ACTIVE)
+    phone             String?
+    address           Json?
+    emergencyContacts Json?
+    insurance         Insurance[]
+    createdAt         DateTime    @default(now())
+    updatedAt         DateTime    @updatedAt
 
     @@index(userId)
     @@index([phone, email])
@@ -57,16 +57,16 @@ model Patient {
 }
 
 model Insurance {
-    id             String   @id @default(uuid())
-    patientId      String
-    patient        Patient  @relation(fields: [patientId], references: [id])
-    providerName   String
-    policyNumber   String
-    policyHolder   String
+    id             String    @id @default(uuid())
+    patientId      String    @unique
+    patient        Patient   @relation(fields: [patientId], references: [id])
+    policyNumber   String?   @unique
+    providerName   String?
+    policyHolder   String?
     groupNumber    String?
-    expirationDate DateTime
+    expirationDate DateTime?
 
     @@index(patientId)
     @@index([providerName, policyNumber])
-    @@map("insurances")
+    @@map("patient_insurances")
 }
