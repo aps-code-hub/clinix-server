@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
+import { RmqModule } from '@clinix/shared/rmq';
+import { SharedAuthModule } from '@clinix/shared/auth';
+
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
 import { HashingService } from './hashing/hashing.service';
-
-import { RmqModule } from '@clinix/shared/rmq';
-import { SharedAuthModule } from '@clinix/shared/auth';
 
 @Module({
   imports: [
@@ -24,9 +24,7 @@ import { SharedAuthModule } from '@clinix/shared/auth';
         },
       }),
     }),
-    RmqModule.register({
-      name: 'RMQ_SERVICE',
-    }),
+    RmqModule.register({ name: 'RMQ_CLIENT' }),
   ],
   controllers: [AuthController],
   providers: [AuthService, HashingService],

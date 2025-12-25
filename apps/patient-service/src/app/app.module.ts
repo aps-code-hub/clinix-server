@@ -26,7 +26,10 @@ import { PrismaModule } from './prisma/prisma.module';
     }),
     PrismaModule,
     SharedAuthModule,
-    RmqModule,
+    RmqModule.register({
+      name: 'PATIENT_SERVICE',
+      bindings: ['user.created.patient'],
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

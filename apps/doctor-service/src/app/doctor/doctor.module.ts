@@ -7,7 +7,13 @@ import { DoctorService } from './doctor.service';
 import { DoctorController } from './doctor.controller';
 
 @Module({
-  imports: [SharedAuthModule, RmqModule],
+  imports: [
+    SharedAuthModule,
+    RmqModule.register({
+      name: 'DOCTOR_SERVICE',
+      bindings: ['user.created.doctor'],
+    }),
+  ],
   controllers: [DoctorController],
   providers: [DoctorService],
 })

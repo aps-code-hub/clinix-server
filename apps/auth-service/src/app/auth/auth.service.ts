@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
@@ -14,7 +15,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { HashingService } from './hashing/hashing.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { Logger } from 'nestjs-pino';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -28,7 +29,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly logger: Logger,
 
-    @Inject('RMQ_SERVICE') private readonly rmqClient: ClientProxy
+    @Inject('RMQ_CLIENT') private readonly rmqClient: ClientProxy
   ) {}
 
   async registerUser(createUserPayload: CreateUserDto) {
@@ -47,12 +48,14 @@ export class AuthService {
       for (const role of newUser.roles) {
         const routingKey = `user.created.${role.toLowerCase()}`;
         this.logger.log(`Emitting event: ${routingKey} for ${newUser.email}`);
-        this.rmqClient.emit(routingKey, {
-          userId: newUser.id,
-          email: newUser.email,
-          firstName: newUser.firstName,
-          lastName: newUser.lastName,
-        });
+        await lastValueFrom(
+          this.rmqClient.emit(routingKey, {
+            userId: newUser.id,
+            email: newUser.email,
+            firstName: newUser.firstName,
+            lastName: newUser.lastName,
+          })
+        );
       }
     }
 

@@ -4,7 +4,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 
 interface RmqModuleOptions {
-  name: string; // The name of the service we want to talk to (e.g., 'PATIENT')
+  name: string;
+  bindings?: string[];
 }
 
 @Module({
@@ -16,7 +17,7 @@ export class RmqModule {
    * Used by Producers (like Auth Service) to register a client
    * that can send messages to a specific queue.
    */
-  static register({ name }: RmqModuleOptions): DynamicModule {
+  static register({ name, bindings = [] }: RmqModuleOptions): DynamicModule {
     return {
       module: RmqModule,
       imports: [
@@ -39,7 +40,13 @@ export class RmqModule {
           },
         ]),
       ],
-      exports: [ClientsModule],
+      providers: [
+        {
+          provide: 'RMQ_CONFIG',
+          useValue: { name, bindings },
+        },
+      ],
+      exports: [ClientsModule, RmqService],
     };
   }
 }
