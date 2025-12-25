@@ -13,10 +13,10 @@ import { v4 as uuidv4 } from 'uuid';
 export class GlobalExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(GlobalExceptionsFilter.name);
 
-  constructor(private readonly hhtpAdapterHost: HttpAdapterHost) {}
+  constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
-    const { httpAdapter } = this.hhtpAdapterHost;
+    const { httpAdapter } = this.httpAdapterHost;
     const ctx = host.switchToHttp();
     const request = ctx.getRequest();
     const response = ctx.getResponse();

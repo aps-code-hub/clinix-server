@@ -31,8 +31,8 @@ import { AppService } from './app.service';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
         const redisHost = configService.get('REDIS_HOST') || 'localhost';
-        const rediPort = configService.get('REDIS_PORT') || '6379';
-        const redisUrl = `redis://${redisHost}:${rediPort}`;
+        const redisPort = configService.get('REDIS_PORT') || '6379';
+        const redisUrl = `redis://${redisHost}:${redisPort}`;
 
         return {
           stores: [

@@ -1,5 +1,4 @@
 import {
-  Inject,
   Injectable,
   ForbiddenException,
   UnauthorizedException,
@@ -7,7 +6,8 @@ import {
 import { Logger } from 'nestjs-pino';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { ClientProxy } from '@nestjs/microservices';
+
+import { RmqService } from '@clinix/shared/rmq';
 
 import { LoginDto } from '../users/dto/login.dto';
 import { UsersService } from '../users/users.service';
@@ -15,7 +15,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { HashingService } from './hashing/hashing.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -28,17 +27,14 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly prisma: PrismaService,
     private readonly logger: Logger,
-
-    @Inject('RMQ_CLIENT') private readonly rmqClient: ClientProxy
+    private readonly rmqService: RmqService
   ) {}
 
   async registerUser(createUserPayload: CreateUserDto) {
-    // 1. Hash password
     const hashedPassword = await this.hashingService.hash(
       createUserPayload.password
     );
 
-    // 2. Create user with the hased password
     const newUser = await this.userService.create({
       ...createUserPayload,
       password: hashedPassword,
@@ -47,15 +43,12 @@ export class AuthService {
     if (newUser.roles && newUser.roles.length > 0) {
       for (const role of newUser.roles) {
         const routingKey = `user.created.${role.toLowerCase()}`;
-        this.logger.log(`Emitting event: ${routingKey} for ${newUser.email}`);
-        await lastValueFrom(
-          this.rmqClient.emit(routingKey, {
-            userId: newUser.id,
-            email: newUser.email,
-            firstName: newUser.firstName,
-            lastName: newUser.lastName,
-          })
-        );
+        await this.rmqService.publish(routingKey, {
+          userId: newUser.id,
+          email: newUser.email,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+        });
       }
     }
 

@@ -1,11 +1,15 @@
 import * as amqp from 'amqplib';
 import { Logger } from 'nestjs-pino';
 import { ConfigService } from '@nestjs/config';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 import { RmqContext, RmqOptions, Transport } from '@nestjs/microservices';
 
 @Injectable()
-export class RmqService {
+export class RmqService implements OnModuleDestroy {
+  private publishConnection: Awaited<ReturnType<typeof amqp.connect>> | null =
+    null;
+  private publishChannel: amqp.Channel | null = null;
+
   constructor(
     private readonly configService: ConfigService,
     private readonly logger: Logger,
@@ -118,5 +122,79 @@ export class RmqService {
     const channel = context.getChannelRef();
     const originalMessage = context.getMessage();
     channel.ack(originalMessage);
+  }
+
+  /**
+   * Publish a message to the topic exchange with a routing key.
+   * This properly routes messages through the exchange for topic-based routing.
+   * @param routingKey - The routing key (e.g., 'user.created.patient')
+   * @param message - The message payload to publish
+   */
+  async publish<T>(routingKey: string, message: T): Promise<void> {
+    const uri = this.configService.get<string>('RABBITMQ_URI');
+    const exchange = this.configService.get<string>('RABBITMQ_EXCHANGE_NAME');
+
+    if (!uri || !exchange) {
+      this.logger.error({
+        msg: '❌ Cannot publish: Missing RabbitMQ configuration',
+        uri: uri ? 'Defined' : 'Missing',
+        exchange: exchange ? 'Defined' : 'Missing',
+      });
+      throw new Error('Missing RabbitMQ configuration for publishing');
+    }
+
+    try {
+      // Lazy initialize connection and channel for publishing
+      if (!this.publishConnection || !this.publishChannel) {
+        this.publishConnection = await amqp.connect(uri);
+        this.publishChannel = await this.publishConnection.createChannel();
+        await this.publishChannel.assertExchange(exchange, 'topic', {
+          durable: true,
+        });
+        this.logger.log(`📡 Publisher connected to exchange: ${exchange}`);
+      }
+
+      // NestJS expects messages in { pattern, data } format for @EventPattern
+      const nestJsMessage = {
+        pattern: routingKey,
+        data: message,
+      };
+
+      const messageBuffer = Buffer.from(JSON.stringify(nestJsMessage));
+      this.publishChannel.publish(exchange, routingKey, messageBuffer, {
+        persistent: true,
+        contentType: 'application/json',
+      });
+
+      this.logger.log({
+        msg: `📤 Published event`,
+        routingKey,
+        exchange,
+      });
+    } catch (error) {
+      this.logger.error({
+        msg: '❌ Failed to publish message',
+        routingKey,
+        error: error instanceof Error ? error.message : error,
+      });
+      // Reset connection on error for retry
+      this.publishConnection = null;
+      this.publishChannel = null;
+      throw error;
+    }
+  }
+
+  async onModuleDestroy() {
+    try {
+      if (this.publishChannel) {
+        await this.publishChannel.close();
+      }
+      if (this.publishConnection) {
+        await this.publishConnection.close();
+      }
+      this.logger.log('🔌 RMQ publisher connection closed');
+    } catch (error) {
+      this.logger.error('Error closing RMQ connection', error);
+    }
   }
 }

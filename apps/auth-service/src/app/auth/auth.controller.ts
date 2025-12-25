@@ -6,15 +6,23 @@ import {
   UseGuards,
   HttpStatus,
   Controller,
-  Get,
 } from '@nestjs/common';
+
+import { JwtAuthGuard } from '@clinix/shared/auth';
 
 import { AuthService } from './auth.service';
 import { LoginDto } from '../users/dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 
-import { JwtAuthGuard } from '@clinix/shared/auth';
+interface AuthenticatedRequest {
+  user: {
+    userId: string;
+    email: string;
+    roles: string[];
+    deviceId: string;
+  };
+}
 
 @Controller({
   path: 'auth',
@@ -40,11 +48,11 @@ export class AuthController {
     return this.authService.refreshTokens(refreshTokenPayload);
   }
 
-  @Get('logout')
+  @Post('logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async logout(@Request() req: { userId: string; deviceId: string }) {
-    const { userId, deviceId } = req;
+  async logout(@Request() req: AuthenticatedRequest) {
+    const { userId, deviceId } = req.user;
     return this.authService.logout(userId, deviceId);
   }
 }

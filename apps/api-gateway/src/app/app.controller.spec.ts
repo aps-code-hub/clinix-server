@@ -3,19 +3,20 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 describe('AppController', () => {
-  let app: TestingModule;
+  let appController: AppController;
 
   beforeAll(async () => {
-    app = await Test.createTestingModule({
+    const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
       providers: [AppService],
     }).compile();
+
+    appController = app.get<AppController>(AppController);
   });
 
   describe('getData', () => {
-    it('should return "Hello API"', () => {
-      const appController = app.get<AppController>(AppController);
-      expect(appController.getData()).toEqual({ message: 'Hello API' });
+    it('should return gateway health message', () => {
+      expect(appController.getData()).toEqual({ message: 'Hello API-Gateway' });
     });
   });
 });

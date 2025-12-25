@@ -24,7 +24,7 @@ import { HashingService } from './hashing/hashing.service';
         },
       }),
     }),
-    RmqModule.register({ name: 'RMQ_CLIENT' }),
+    RmqModule.register({ name: 'AUTH' }),
   ],
   controllers: [AuthController],
   providers: [AuthService, HashingService],
