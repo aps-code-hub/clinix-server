@@ -10,7 +10,7 @@ import { DoctorController } from './doctor.controller';
   imports: [
     SharedAuthModule,
     RmqModule.register({
-      name: 'DOCTOR_SERVICE',
+      name: 'DOCTOR',
       bindings: ['user.created.doctor'],
     }),
   ],

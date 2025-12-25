@@ -28,7 +28,9 @@ export class RmqService {
     if (!uri || !queueName || !exchange) {
       this.logger.error('❌ Error: Missing RABBITMQ variables in .env file');
       this.logger.error(`URI: ${uri ? 'Defined' : 'Missing'}`);
-      this.logger.error(`Queue Name: ${queueName ? 'Defined' : 'Missing'}`);
+      this.logger.error(
+        `Queue Name: << ${name} >> ${queueName ? 'Defined' : 'Missing'}`
+      );
       this.logger.error(`Exchange Name: ${exchange ? 'Defined' : 'Missing'}`);
       return;
     }

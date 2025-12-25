@@ -19,7 +19,7 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const rmqUri = configService.get<string>('RABBITMQ_URI');
-  const queueName = configService.get<string>('RABBITMQ_PATIENT_SERVICE_QUEUE');
+  const queueName = configService.get<string>('RABBITMQ_PATIENT_QUEUE');
 
   if (!rmqUri) {
     throw new Error('FATAL: RABBITMQ_URI is not defined in .env file');
@@ -32,7 +32,7 @@ async function bootstrap() {
   logger.log({ msg: 'Connecting to RabbitMQ', uri: rmqUri, queue: queueName });
 
   const rmqService = app.get<RmqService>(RmqService);
-  app.connectMicroservice(rmqService.getOptions('PATIENT_SERVICE'));
+  app.connectMicroservice(rmqService.getOptions('PATIENT'));
   await app.startAllMicroservices();
 
   const globalPrefix = 'api';
