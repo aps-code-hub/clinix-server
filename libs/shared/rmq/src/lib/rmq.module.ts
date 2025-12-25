@@ -28,6 +28,11 @@ export class RmqModule {
               options: {
                 urls: [configService.get<string>('RABBITMQ_URI') || ''],
                 queue: configService.get<string>(`RABBITMQ_${name}_QUEUE`),
+                queueOptions: {
+                  durable: true,
+                },
+                exchange: configService.get<string>('RABBITMQ_EXCHANGE_NAME'),
+                exchangeType: 'topic',
               },
             }),
             inject: [ConfigService],

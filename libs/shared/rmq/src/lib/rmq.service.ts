@@ -10,6 +10,10 @@ export class RmqService {
     private readonly logger: Logger
   ) {}
 
+  onModuleInit() {
+    this.logger.log('RmqService initialized');
+  }
+
   /**
    * @param queue - the specific queue name to listen (e.g. PATIENT)
    * @param noAck - If fasle, we manually acknowledge the messages
@@ -17,12 +21,16 @@ export class RmqService {
   getOptions(queue: string, noAck = false): RmqOptions {
     const uri = this.configService.get<string>('RABBITMQ_URI');
     const queueName = this.configService.get<string>(`RABBITMQ_${queue}_QUEUE`);
+    const exchangeName = this.configService.get<string>(
+      'RABBITMQ_EXCHANGE_NAME'
+    );
 
     this.logger.log({
       msg: 'Resolving RabbitMQ Options',
       queue,
       queueName,
       mode: noAck ? 'Auto-Ack' : 'Manual-Ack (Safe)',
+      exchangeName,
     });
 
     if (!uri || uri.trim() === '') {
@@ -49,6 +57,8 @@ export class RmqService {
         queueOptions: {
           durable: true,
         },
+        exchange: exchangeName,
+        exchangeType: 'topic',
         socketOptions: {
           clientProperties: {
             connection_name: queue,
